@@ -98,6 +98,39 @@
     .btn-fechar { flex: 1; background: var(--warm); color: var(--brown); border: none; border-radius: 30px; padding: 0.75rem; font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
     .modal-valor { text-align: center; font-size: 0.85rem; color: var(--muted); }
     .modal-valor strong { color: var(--brown); }
+    /* SOBRE */
+    .sobre-section { background: var(--white); }
+    .sobre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+    .sobre-text h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--brown); margin-bottom: 1rem; }
+    .sobre-text p { color: var(--muted); line-height: 1.8; margin-bottom: 1rem; font-size: 0.97rem; }
+    .sobre-badge { display: inline-block; background: var(--accent); color: #fff; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 30px; padding: 0.3rem 1rem; margin-bottom: 1rem; }
+    .sobre-img { background: var(--warm); border-radius: 18px; aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center; font-size: 6rem; box-shadow: var(--shadow); }
+
+    /* ENTREGA */
+    .entrega-section { background: var(--cream); }
+    .entrega-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+    .entrega-card { background: var(--white); border-radius: 14px; padding: 1.5rem; box-shadow: var(--shadow); text-align: center; }
+    .entrega-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+    .entrega-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--brown); margin-bottom: 0.5rem; }
+    .entrega-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+
+    /* DEPOIMENTOS */
+    .dep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    .dep-card { background: var(--white); border-radius: 14px; padding: 1.5rem; box-shadow: var(--shadow); }
+    .dep-stars { color: #f39c12; font-size: 1rem; margin-bottom: 0.7rem; }
+    .dep-text { font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin-bottom: 1rem; font-style: italic; }
+    .dep-autor { font-weight: 700; font-size: 0.85rem; color: var(--brown); }
+
+    /* WHATSAPP */
+    .whatsapp-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 150; background: #25d366; color: #fff; border: none; border-radius: 50px; padding: 0.8rem 1.4rem; font-family: 'Lato', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(37,211,102,0.4); display: flex; align-items: center; gap: 0.5rem; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
+    .whatsapp-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(37,211,102,0.5); }
+
+    /* SELOS */
+    .selos { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; padding: 2rem; background: var(--white); border-top: 1px solid var(--warm); }
+    .selo { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+
+    @media (max-width: 700px) { .sobre-grid { grid-template-columns: 1fr; } .sobre-img { display: none; } }
+
     footer { background: var(--brown); color: var(--warm); text-align: center; padding: 2rem 1rem; font-size: 0.9rem; margin-top: 2rem; }
     footer strong { color: #fff; }
     @media (max-width: 600px) { header { padding: 0 1rem; } nav a { display: none; } .hero { padding: 3rem 1rem 2.5rem; } section { padding: 2.5rem 1rem; } }
