@@ -129,6 +129,24 @@
     .selos { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; padding: 2rem; background: var(--white); border-top: 1px solid var(--warm); }
     .selo { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 700; color: var(--muted); }
 
+    /* BUSCA E FILTRO */
+    .search-filter { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 0.7rem 1.2rem; border: 2px solid var(--warm); border-radius: 30px; font-family: 'Lato', sans-serif; font-size: 0.95rem; color: var(--text); background: var(--white); outline: none; transition: border 0.2s; }
+    .search-input:focus { border-color: var(--brown); }
+    .filter-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn { background: var(--warm); border: none; border-radius: 20px; padding: 0.5rem 1rem; font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--brown); cursor: pointer; transition: background 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--brown); color: #fff; }
+
+    /* LIGHTBOX */
+    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .lightbox.open { opacity: 1; pointer-events: all; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 12px; object-fit: contain; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; }
+
+    /* SHARE BTN */
+    .share-btn { background: #25d366; color: #fff; border: none; border-radius: 20px; padding: 0.4rem 0.8rem; font-size: 0.78rem; font-weight: 700; cursor: pointer; margin-left: 0.4rem; transition: background 0.2s; }
+    .share-btn:hover { background: #1da851; }
+
     @media (max-width: 700px) { .sobre-grid { grid-template-columns: 1fr; } .sobre-img { display: none; } }
 
     footer { background: var(--brown); color: var(--warm); text-align: center; padding: 2rem 1rem; font-size: 0.9rem; margin-top: 2rem; }
@@ -156,6 +174,12 @@
 <section id="produtos">
   <div class="section-title">Nossos Produtos</div>
   <div class="section-sub">Peças únicas feitas à mão — cada uma com sua própria história</div>
+  <div class="search-filter">
+    <input class="search-input" id="searchInput" type="text" placeholder="🔍 Buscar produto..." oninput="filterProducts()" />
+    <div class="filter-btns" id="filterBtns">
+      <button class="filter-btn active" onclick="setFilter('todos', this)">Todos</button>
+    </div>
+  </div>
   <div class="products-grid" id="productsGrid"></div>
 </section>
 
@@ -204,6 +228,12 @@
     </div>
     <div class="modal-valor">Valor: <strong id="pixValor"></strong></div>
   </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="fecharLightbox()">
+  <button class="lightbox-close" onclick="fecharLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt=""/>
 </div>
 
 <!-- SOBRE -->
@@ -412,6 +442,40 @@ function fecharModal() {
   document.getElementById('modalOverlay').classList.remove('open');
 }
 
+var currentFilter = 'todos';
+var currentSearch = '';
+
+function setFilter(tag, btn) {
+  currentFilter = tag;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderProducts();
+}
+
+function filterProducts() {
+  currentSearch = document.getElementById('searchInput').value.toLowerCase();
+  renderProducts();
+}
+
+function abrirLightbox(img, nome) {
+  if (!img) return;
+  document.getElementById('lightboxImg').src = img;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function fecharLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+function compartilhar(id) {
+  var p = null;
+  for (var i = 0; i < products.length; i++) if (products[i].id === id) { p = products[i]; break; }
+  if (!p) return;
+  var texto = 'Olha essa peça incrível: *' + p.name + '* por R$ ' + p.price.toFixed(2).replace('.', ',') + '\n\nAcesse: ' + window.location.href;
+  var url = 'https://wa.me/?text=' + encodeURIComponent(texto);
+  window.open(url, '_blank');
+}
+
 function renderProducts() {
   var grid = document.getElementById('productsGrid');
   if (products.length === 0) {
@@ -421,8 +485,8 @@ function renderProducts() {
   }
   grid.style.display = 'grid';
   var html = '';
-  for (var i = 0; i < products.length; i++) {
-    var p = products[i];
+  for (var i = 0; i < filtered.length; i++) {
+    var p = filtered[i];
     html += '<div class="product-card">' +
       '<div class="product-img" onclick="abrirFoto(\'' + (p.img || '') + '\')" style="cursor:' + (p.img ? 'zoom-in' : 'default') + ';">' + (p.img ? '<img src="' + p.img + '" style="width:100%;height:100%;object-fit:cover;" />' : p.icon) + '</div>' +
       '<div class="product-info">' +
@@ -432,6 +496,7 @@ function renderProducts() {
       '<div class="product-footer">' +
       '<div class="product-price">R$ ' + p.price.toFixed(2).replace('.', ',') + '</div>' +
       '<button class="add-btn" id="btn' + p.id + '" onclick="addToCart(' + p.id + ')">+ Adicionar</button>' +
+      '<button class="share-btn" onclick="compartilhar(' + p.id + ')">📲</button>' +
       '</div></div></div>';
   }
   grid.innerHTML = html;
@@ -526,4 +591,3 @@ function fecharFoto() {
 </script>
 </body>
 </html>
-
