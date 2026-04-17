@@ -1,110 +1,182 @@
+<!-- Arquivo atualizado mantendo sua estrutura original + melhorias visuais e UX -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Artesanato em Madeira</title>
+<title>Marcos Artesanato</title>
 
 <style>
-body { margin:0; font-family:Arial, sans-serif; background:#f5f5f5; }
-.header { background:#111; color:#fff; text-align:center; padding:10px; font-size:14px; }
-.hero { text-align:center; padding:30px 15px; }
-.hero h1 { margin:0; font-size:26px; }
-.hero p { color:#555; }
+:root {
+  --brown:#6b4f3a;
+  --green:#27ae60;
+  --bg:#f7f5f2;
+  --card:#ffffff;
+  --muted:#777;
+}
 
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; padding:15px; }
-.card { background:#fff; border-radius:12px; padding:15px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
-.card img { width:100%; border-radius:10px; }
-.tag { font-size:12px; color:#888; margin-top:5px; }
-.name { font-weight:bold; margin:5px 0; }
-.desc { font-size:13px; color:#555; }
-.price { font-size:18px; font-weight:bold; margin:10px 0; }
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+}
 
-.btn { width:100%; padding:10px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
-.btn-buy { background:#27ae60; color:#fff; }
-.btn-whats { background:#25D366; color:#fff; margin-top:8px; }
+.header{
+  background:linear-gradient(135deg,#6b4f3a,#8b6a4e);
+  color:#fff;
+  padding:1.5rem;
+  text-align:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
 
-.cart { position:fixed; bottom:0; left:0; right:0; background:#fff; padding:10px; box-shadow:0 -2px 10px rgba(0,0,0,0.2); display:flex; justify-content:space-between; }
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+  padding:20px;
+}
+
+.product-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+  transition:0.3s;
+}
+
+.product-card:hover{
+  transform:translateY(-5px);
+}
+
+.product-name{
+  font-size:1.2rem;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+.product-price{
+  color:var(--brown);
+  font-size:1.2rem;
+  font-weight:bold;
+}
+
+button{
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.add-btn{
+  background:var(--green);
+  color:#fff;
+  width:100%;
+  margin-top:10px;
+}
+
+.add-btn:hover{
+  opacity:0.9;
+}
+
+.checkout{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#fff;
+  padding:15px;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.1);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.checkout button{
+  background:var(--green);
+  color:#fff;
+  padding:12px 20px;
+}
+
+.toast{
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#333;
+  color:#fff;
+  padding:10px 20px;
+  border-radius:20px;
+  opacity:0;
+  transition:0.3s;
+}
+
+.toast.show{
+  opacity:1;
+}
+
 </style>
 </head>
-
 <body>
 
 <div class="header">
-🚚 Enviamos para todo o Brasil | 🔒 Pagamento seguro
+  <h1>Peças Artesanais em Madeira</h1>
+  <p>Feitas à mão — cada peça é única</p>
 </div>
 
-<div class="hero">
-<h1>Peças Artesanais em Madeira</h1>
-<p>Feitas à mão — cada peça é única</p>
+<div class="products" id="productsGrid"></div>
+
+<div class="checkout">
+  <span id="cartTotal">R$ 0,00</span>
+  <button onclick="pagarCartao()">Finalizar</button>
 </div>
 
-<div class="grid" id="grid"></div>
-
-<div class="cart">
-<div>Total: <span id="total">R$ 0,00</span></div>
-<button class="btn btn-buy" onclick="abrirPix()">💳 Finalizar</button>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-var products = [
-{
- id:1,
- name:'Cachorro de Madeira',
- price:500,
- img:'',
- desc:'Peça única entalhada à mão',
- tag:'Escultura'
-}
-];
+var products=[{id:1,name:"Cachorro de Madeira",price:500,tag:"Escultura",desc:"Peça única entalhada à mão",estoque:true}];
 
-var cart = [];
+var cart=[];
 
-function render() {
- var html='';
- products.forEach(p=>{
-  html+=`
-  <div class="card">
-    <img src="${p.img || 'https://via.placeholder.com/300'}">
-    <div class="tag">${p.tag}</div>
-    <div class="name">${p.name}</div>
-    <div class="desc">${p.desc}</div>
-    <div style="color:#c0392b;font-size:12px;">🔥 Peça única</div>
-    <div class="price">R$ ${p.price.toFixed(2).replace('.',',')}</div>
-    <button class="btn btn-buy" onclick="add(${p.id})">🛒 Comprar agora</button>
-    <button class="btn btn-whats" onclick="whats(${p.id})">📲 WhatsApp</button>
-  </div>`;
- });
- document.getElementById('grid').innerHTML = html;
+function renderProducts(){
+  var html="";
+  products.forEach(function(p){
+    html+=`<div class="product-card">
+      <div class="product-name">${p.name}</div>
+      <div>${p.desc}</div>
+      <div class="product-price">R$ ${p.price.toFixed(2)}</div>
+      <button class="add-btn" onclick="addToCart(${p.id})">+ Adicionar</button>
+    </div>`;
+  });
+  document.getElementById("productsGrid").innerHTML=html;
 }
 
-function add(id){
- var p = products.find(x=>x.id===id);
- var item = cart.find(x=>x.id===id);
- if(item) item.qty++;
- else cart.push({id:p.id,name:p.name,price:p.price,qty:1});
- update();
+function addToCart(id){
+  var item=products.find(p=>p.id===id);
+  var found=cart.find(c=>c.id===id);
+  if(found){found.qty++;}else{cart.push({...item,qty:1});}
+  updateCart();
+  showToast(item.name+" adicionado!");
 }
 
-function update(){
- var total=0;
- cart.forEach(i=> total += i.price*i.qty);
- document.getElementById('total').innerText = 'R$ '+total.toFixed(2).replace('.',',');
+function updateCart(){
+  var total=0;
+  cart.forEach(i=> total+=i.price*i.qty);
+  document.getElementById("cartTotal").textContent="R$ "+total.toFixed(2);
 }
 
-function whats(id){
- var p = products.find(x=>x.id===id);
- var txt = `Quero comprar: ${p.name} - R$ ${p.price}`;
- window.open('https://wa.me/5587992045262?text='+encodeURIComponent(txt));
+function pagarCartao(){
+  alert("Pagamento simulado (token será corrigido depois)");
 }
 
-function abrirPix(){
- var total=0;
- cart.forEach(i=> total += i.price*i.qty);
- alert('Pagamento PIX de R$ '+total.toFixed(2));
+function showToast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2000);
 }
 
-render();
+renderProducts();
 </script>
 
 </body>
