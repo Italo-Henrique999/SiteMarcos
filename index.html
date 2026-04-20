@@ -477,6 +477,28 @@ function compartilhar(id) {
 }
 
 function renderProducts() {
+  // Build filter buttons
+  var tags = ['todos'];
+  for (var i = 0; i < products.length; i++) {
+    if (products[i].tag && tags.indexOf(products[i].tag) === -1) tags.push(products[i].tag);
+  }
+  var filterBtns = document.getElementById('filterBtns');
+  if (filterBtns) {
+    filterBtns.innerHTML = '';
+    for (var i = 0; i < tags.length; i++) {
+      var t = tags[i];
+      var label = t === 'todos' ? 'Todos' : t;
+      filterBtns.innerHTML += '<button class="filter-btn' + (currentFilter === t ? ' active' : '') + '" onclick="setFilter(\'' + t + '\', this)">' + label + '</button>';
+    }
+  }
+
+  // Filter products
+  var filtered = products.filter(function(p) {
+    var matchTag = currentFilter === 'todos' || p.tag === currentFilter;
+    var matchSearch = !currentSearch || p.name.toLowerCase().indexOf(currentSearch) !== -1 || p.desc.toLowerCase().indexOf(currentSearch) !== -1;
+    return matchTag && matchSearch;
+  });
+
   var grid = document.getElementById('productsGrid');
   if (products.length === 0) {
     grid.style.display = 'block';
